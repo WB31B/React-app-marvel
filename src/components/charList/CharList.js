@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 import MarvelService from '../../services/MarvelService';
 
@@ -18,6 +18,8 @@ class CharList extends Component {
         offset: 210,
         charEnded: false,
     }
+
+    itemRefs = []; // Arr items
 
     marvelService = new MarvelService();
 
@@ -62,8 +64,21 @@ class CharList extends Component {
         }));
     }
 
+    focusOnItem = id => {
+        // remove class
+        this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
+        // add class for id
+        this.itemRefs[id].classList.add('char__item_selected');
+        // focus on class
+        this.itemRefs[id].focus();
+    }
+
+    setRef = ref => {
+        this.itemRefs.push(ref)
+    }
+
     renderItems (arr) {
-        const items = arr.map((item) => {
+        const items = arr.map((item, i) => {
             let imgStyle = { 'objectFit' : 'cover' };
 
             if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
@@ -71,9 +86,14 @@ class CharList extends Component {
             }
 
             return (
-                <li className="char__item"
+                <li className='char__item'
+                    tabIndex={0}
+                    ref={this.setRef}
                     key={item.id}
-                    onClick={() => this.props.onCharSelected(item.id)}>
+                    onClick={() => {
+                        this.props.onCharSelected(item.id);
+                        this.focusOnItem(i);
+                    }}>
                     <img src={item.thumbnail} alt={item.name} style={imgStyle} />
                     <div className="char__name">{ item.name }</div>
                 </li>
